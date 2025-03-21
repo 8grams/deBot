@@ -1,0 +1,31 @@
+.for_development:
+  environment:
+    name: development
+  variables:
+    DOCKER_IMAGE_TAG: latest
+  only:
+    - develop
+
+.build:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  script:
+    - docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
+    - docker pull ${CI_REGISTRY_IMAGE}:${DOCKER_IMAGE_TAG} || true
+      .
+    - docker build
+      --cache-from ${CI_REGISTRY_IMAGE}:${DOCKER_IMAGE_TAG}
+      --tag ${CI_REGISTRY_IMAGE}:${DOCKER_IMAGE_TAG}
+      --label org.label-schema.schema-version="1.0"
+      --label org.label-schema.vcs-url="${CI_PROJECT_URL}.git"
+      --label org.label-schema.vcs-ref="${CI_COMMIT_SHA}"
+      --build-arg BUILD_ENV=${CI_ENVIRONMENT_NAME}
+      .
+    - docker push ${CI_REGISTRY_IMAGE}:${DOCKER_IMAGE_TAG}
+
+development:publish:
+  extends:
+    - .build
+    - .for_development
