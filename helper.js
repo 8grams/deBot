@@ -4,7 +4,6 @@ function mention(id) {
     if(typeof id === 'string') {
         return `<@!${id}>`
     }
-
     return '';
 }
 

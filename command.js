@@ -6,7 +6,7 @@ const Git = require('nodegit');
 const yaml = require('yaml');
 const { DatabaseSync } = require('node:sqlite');
 
-const db = new DatabaseSync('./data/deBot.sqlite');
+const db = new DatabaseSync(process.env.SQLITE_URL);
 
 const gitlabUrl = process.env.GITLAB_URL;
 const gitlabApi = axios.create({
